@@ -523,6 +523,7 @@ components:
         Details for a customer that can be passed to a seller to
         create an account. Once the account is created, a customer
         can be represented as a URI.
+      example: https://example.com/customers/472
       format: uri
 
     BrokerOrganization:
