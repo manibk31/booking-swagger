@@ -332,19 +332,10 @@ components:
                 type: string
                 example: OrderItem
                 pattern: "^OrderItem$"
-              acceptedOffer:
-                type: string
-                format: uri
-                example: https://example.com/sessions/9209#!/offer/2134
-              orderQuantity:
-                type: integer
-                example: 1
               customer:
                 $ref: "#/components/schemas/Customer"
               orderedItem:
-                example: "https://example.com/sessions/9209"
-                type: string
-                format: uri
+                $ref: "#/components/schemas/OrderedItem"
               amount:
                 type: object
                 properties:
@@ -415,6 +406,31 @@ components:
                 currency:
                   type: string
                   example: GBP
+
+    OrderedItem:
+      type: object
+      required:
+        - orderQuantity
+        - acceptedOffer
+        - customer
+      properties:
+        type:
+          type: string
+          example: OrderItem
+          pattern: "^OrderItem$"
+        orderQuantity:
+          type: integer
+          example: 1
+        customer:
+          $ref: "#/components/schemas/Customer"
+        acceptedOffer:
+          example: "https://example.com/sessions/9209#!/offer/2134"
+          type: string
+          format: uri
+        orderedItem:
+          example: "https://example.com/sessions/9209"
+          type: string
+          format: uri
 
     Offer:
       type: object
@@ -1009,29 +1025,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            required:
-              - acceptedOffer
-              - customer
-              - orderQuantity
-            properties:
-              type:
-                type: string
-                example: OrderItem
-                pattern: "^OrderItem$"
-              orderQuantity:
-                type: integer
-                example: 1
-              customer:
-                $ref: "#/components/schemas/Customer"
-              acceptedOffer:
-                example: "https://example.com/sessions/9209#!/offer/2134"
-                type: string
-                format: uri
-              orderedItem:
-                example: "https://example.com/sessions/9209"
-                type: string
-                format: uri
+            $ref: "#/components/schemas/OrderedItem"
 
     postOrder:
       description: Order object that needs to be added to the store
@@ -1047,12 +1041,13 @@ components:
             properties:
               type:
                 type: string
+                example: Order
                 pattern: "^Order$"
               customer:
                 $ref: "#/components/schemas/Customer"
               broker:
                 $ref: "#/components/schemas/BrokerOrganization"
               orderedItem:
-                $ref: "#/components/schemas/OrderedEvent"
+                $ref: "#/components/schemas/OrderedItem"
               discount:
                 $ref: "#/components/schemas/RequestDiscount"
