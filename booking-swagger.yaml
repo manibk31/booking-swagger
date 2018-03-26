@@ -168,7 +168,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  orders:
+                  orderItem:
                     type: array
                     items:
                       $ref: "#/components/schemas/EntireOrder"
@@ -424,7 +424,7 @@ components:
         customer:
           $ref: "#/components/schemas/Customer"
         acceptedOffer:
-          example: "https://example.com/sessions/9209#!/offer/2134"
+          example: "https://example.com/sessions/9209#/offer/2134"
           type: string
           format: uri
         orderedItem:
@@ -455,31 +455,25 @@ components:
           example: Winger space for Speedball.
 
     Customer:
-      oneOf:
-      - type: string
-        format: uri
-        description: |
-          A uri representing a customer when that customer is
-          well-known to the seller.
-      - type: object
-        description: |
-          Details for a customer that can be passed to a seller to
-          create an account. Once the account is created, a customer
-          can be represented as a URI.
-        properties:
-          type:
-            type: string
-            pattern: "^Customer$"
-          givenName:
-            type: string
-            example: Joe
-          familyName:
-            type: string
-            example: Bloggs
-          email:
-            type: string
-            format: email
-            example: joe@example.com
+      type: object
+      description: |
+        Details for a customer that can be passed to a seller to
+        create an account. Once the account is created, a customer
+        can be represented as a URI.
+      properties:
+        type:
+          type: string
+          pattern: "^Customer$"
+        givenName:
+          type: string
+          example: Joe
+        familyName:
+          type: string
+          example: Bloggs
+        email:
+          type: string
+          format: email
+          example: joe@example.com
 
     BrokerOrganization:
       type: object
@@ -731,7 +725,7 @@ components:
           example: '2018-01-27T11:00:00Z'
           format: date-time
         acceptedOffer:
-          example: "https://example.com/sessions/9209#!/offer/2134"
+          example: "https://example.com/sessions/9209#/offer/2134"
           type: string
           format: uri
 
