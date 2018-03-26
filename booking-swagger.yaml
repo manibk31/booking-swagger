@@ -1,0 +1,1036 @@
+# -*- mode: OpenAPI-YAML -*-
+
+openapi: 3.0.0
+servers:
+  - description: ODI Booking API Draft
+    url: https://virtserver.swaggerhub.com/theodi/booking-draft/1.0.0
+info:
+  description: >-
+    API specification for the current draft of the Booking API.
+  version: "0.4"
+  title: Booking API
+  contact:
+    email: phil.jackson@theoodi.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+tags:
+- name: Locations
+  description: Beta.
+- name: Sessions
+  description: Modelling Opportunity Data v1.0
+- name: Orders
+  description: Booking Specification v0.4
+- name: Activities
+  description: Modelling Opportunity Data v1.0
+- name: Categories
+  description: Modelling Opportunity Data v1.0
+
+paths:
+  /sessions:
+    get:
+      tags:
+        - Sessions
+      summary: List all events.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedEventList"
+
+  /sessions/{sessionId}:
+    get:
+      tags:
+        - Sessions
+      summary: Details for a specific event.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FullEvent"
+
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: List all categories as a controlled vocabulary.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryList"
+
+  /activities:
+    get:
+      tags:
+        - Activities
+      summary: List all activities as a controlled vocabulary.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityList"
+
+  /locations:
+    get:
+      tags:
+        - Locations
+      summary: List all locations.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  location:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Place"
+
+  /locations/{locationID}:
+    parameters:
+      - $ref: "#/components/parameters/locationId"
+    get:
+      tags:
+        - Locations
+      summary: Returns information about a specific location.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Place"
+        404:
+          description: Given orderId doesn't exist.
+
+  /locations/{locationID}/leaders:
+    parameters:
+      - $ref: "#/components/parameters/locationId"
+    get:
+      tags:
+        - Locations
+      summary: Lists all leaders at a given location.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  leader:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Person"
+
+  /locations/{locationID}/leaders/{leaderId}:
+    parameters:
+      - $ref: "#/components/parameters/leaderId"
+      - $ref: "#/components/parameters/locationId"
+    get:
+      tags:
+        - Locations
+      summary: Information about a specific leader.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+
+  /orders:
+    description: >-
+      Creates a new order. It's not unreasonable to think of this
+      endpoint as a basket and the following operations will act upon
+      that basket.
+    get:
+      tags:
+        - Orders
+      summary: List all orders.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EntireOrder"
+    post:
+      tags:
+        - Orders
+      summary: Reserve an Event’s space for a finite amount of time.
+      description: >-
+        Reserve an Event’s space for a finite amount of time.
+
+        An object is created with an expiry time (which is expected to
+        be equal to 180 seconds unless `beta:anonymousLeaseDuration` was
+        set).
+
+        With regards to a customer being provided with the call, there
+        are two options: provided the customer can be identified from
+        the authentication scheme chosen then referencing them via an
+        ID is possible. Or, a full customer object can be included.
+
+        If the lease times out before it is booked, the customer
+        details provided with the lease must be discarded by the
+        booking system.
+      responses:
+        201:
+          description: Created
+      requestBody:
+        $ref: "#/components/requestBodies/postOrder"
+
+  /orders/{orderId}:
+    parameters:
+      - $ref: "#/components/parameters/orderId"
+    get:
+      tags:
+        - Orders
+      summary: Fetches an order with all of its items included.
+      description: Fetches an order with all of its items included. 
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/EntireOrder"
+        404:
+          description: Given orderId doesn't exist.
+    delete:
+      tags:
+        - Orders
+      summary: Delete an individual order, including all of its order items.
+      responses:
+        204:
+          description: No Content
+        404:
+          description: Given orderId doesn't exist.
+
+  /orders/{orderId}/ordereditems:
+    parameters:
+      - $ref: "#/components/parameters/orderId"
+    post:
+      tags:
+        - Orders
+      summary: Add an item to an order.
+      description: >-
+        Add a new items to the order represented by `orderId`.
+      requestBody:
+        $ref: "#/components/requestBodies/postOrderItem"
+      responses:
+        201:
+          description: Created
+        404:
+          description: Given orderId doesn't exist.
+
+  /orders/{orderId}/ordereditems/{itemId}:
+    parameters:
+      - $ref: "#/components/parameters/orderId"
+      - $ref: "#/components/parameters/itemId"
+    delete:
+      tags:
+        - Orders
+      summary: Delete an individual item from an order.
+      responses:
+        204:
+          description: No Content
+        404:
+          description: Given orderId or itemId doesn't exist.
+
+  /orders/{orderId}/payment:
+    post:
+      tags:
+        - Orders
+      summary: Make a payment on an order.
+      responses:
+        201:
+          description: Created
+        404:
+          description: Given orderId doesn't exist.
+      requestBody:
+        $ref: "#/components/requestBodies/postPayment"
+
+components:
+  parameters:
+    itemId:
+      in: path
+      name: itemId
+      schema:
+        type: string
+      required: true
+      description: Identifies a specific item within an order.
+    orderId:
+      in: path
+      name: orderId
+      schema:
+        type: string
+      required: true
+      description: Identifies the order.
+    leaderId:
+      in: path
+      name: leaderId
+      schema:
+        type: string
+      required: true
+      description: Identifies the leader (person).
+    locationId:
+      in: path
+      name: locationId
+      schema:
+        type: string
+      required: true
+      description: Identifies the location.
+
+  schemas:
+    EntireOrder:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Order
+          pattern: "^Order$"
+        id:
+          type: string
+          format: uri
+          example: https://example.com/orders/535
+        identifier:
+          type: integer
+          example: 535
+        beta:paymentPostUrl:
+          type: string
+          example: "https://example.com/orders/535/payment"
+          format: uri
+          description: >-
+            This URL is the location that accepts payment
+            conformations as a POST. Once payment has been met, it is
+            up to the Seller to mark the `orderStatus` as
+            OrderDelivered.
+        orders:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: OrderItem
+                pattern: "^OrderItem$"
+              acceptedOffer:
+                type: string
+                format: uri
+                example: https://example.com/sessions/9209#!/offer/2134
+              orderQuantity:
+                type: integer
+                example: 1
+              customer:
+                $ref: "#/components/schemas/Customer"
+              orderedItem:
+                example: "https://example.com/sessions/9209"
+                type: string
+                format: uri
+              amount:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: MonetaryAmount
+                  value:
+                    type: string
+                    example: '10.00'
+                  currency:
+                    type: string
+                    example: GBP
+              discount:
+                $ref: "#/components/schemas/ResponseDiscount"
+              subTotalPrice:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: MonetaryAmount
+                  value:
+                    type: string
+                    example: '5.00'
+                  currency:
+                    type: string
+                    example: GBP
+
+        orderStatus:
+          type: string
+          example: OrderPaymentDue
+          description: >-
+            This is the status of the entire payment. As payments are
+            pending, the status will be `OrderPaymentDue`, once
+            payment has been met, the status will be updated to
+            `OrderDelivered`. The status `EmailValidationRequired` is
+            intended to hold the booking until a Customer's email
+            address has been validated.
+          enum:
+            - OrderPaymentDue
+            - OrderDelivered
+            - EmailValidationRequired
+        paymentDueDate:
+          type: string
+          example: '2018-02-20T11:00:00Z'
+          format: date-time
+        orderDate:
+          type: string
+          example: '2018-02-20T11:00:00Z'
+          format: date-time
+        partOfInvoice:
+          type: object
+          properties:
+            type:
+              type: string
+              example: Invoice
+            paymentStatus:
+              type: string
+              example: PaymentDue
+            totalPaymentDue:
+              type: object
+              properties:
+                type:
+                  type: string
+                  example: MonetaryAmount
+                value:
+                  type: string
+                  example: '10.00'
+                currency:
+                  type: string
+                  example: GBP
+
+    Offer:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Offer
+        identifier:
+          type: integer
+          example: 2134
+        name:
+          type: string
+          example: Speedball winger position
+        price:
+          type: string
+          example: 33.00
+        priceCurrency:
+          type: string
+          example: GBP
+        description:
+          type: string
+          example: Winger space for Speedball.
+
+    Customer:
+      oneOf:
+      - type: string
+        format: uri
+        description: |
+          A uri representing a customer when that customer is
+          well-known to the seller.
+      - type: object
+        description: |
+          Details for a customer that can be passed to a seller to
+          create an account. Once the account is created, a customer
+          can be represented as a URI.
+        properties:
+          type:
+            type: string
+            pattern: "^Customer$"
+          givenName:
+            type: string
+            example: Joe
+          familyName:
+            type: string
+            example: Bloggs
+          email:
+            type: string
+            format: email
+            example: joe@example.com
+
+    BrokerOrganization:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Organization
+          pattern: "^Organization$"
+        name:
+          type: string
+          example: MyFitnessApp
+        url:
+          type: string
+          format: uri
+          example: "https://myfitnessapp.example.com"
+
+    EventOrganizer:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Organization
+          pattern: "^Organization$"
+        name:
+          type: string
+          example: Central Speedball Association
+        url:
+          type: string
+          format: uri
+          example: http://www.speedball-world.com
+
+    ItemEnvelope:
+      type: object
+      required:
+        - state
+        - kind
+        - id
+        - modified
+        - data
+      properties:
+        id:
+          type: string
+          example: 9209
+          description: >-
+            The id property is the unique identifier of the item. Two
+            items must not share the same id. Although the IDs shown
+            here are GUIDs, and other examples are numeric, this
+            specification does not prescribe any specific format.
+        state:
+          type: string
+          enum:
+            - updated
+            - deleted
+          example: updated
+          description: >-
+            The state property must be of value "updated" or value
+            "deleted". Deleted items are included in the response with
+            a "deleted" state, but no `data` associated.
+        kind :
+          type: string
+          example: session
+        modified:
+          type: string
+          example: "2014-04-29T12:14:35"
+          format: date-time
+          description: >-
+            The modified property should contain either the modified
+            timestamp or change number of the item, depending on the
+            ordering strategy used. It must be appropriately
+            comparable to itself as either a string or integer,
+            representing a chronological ordering. It must always be
+            updated when any data within `data` is updated, and such
+            an update must set the value of the property to be greater
+            than or equal to (>=) all existing modified values. It may
+            be any format, but should be an integer where
+            possible. Integer values must be represented as integers,
+            not strings. The value of the modified property of the
+            last item must be used in either the afterTimestamp or
+            afterChangeNumber parameter of the "next" URL (though such
+            an item may not be included in `items` if it is filtered
+            out). The format of the modified property and the relevant
+            URL parameter must be identical.
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullEvent"
+          description: >-
+            Note this property must not be included if `state` is
+            "deleted".
+
+    FullEvent:
+      type: object
+      properties:
+        "@context":
+            type: string
+            format: uri
+            example: https://www.openactive.io/ns/oa.jsonld
+        type:
+          type: string
+          example: Event
+        identifier:
+          type: integer
+          example: 9209
+        id:
+          type: string
+          example: https://example.com/sessions/9209
+          format: uri
+        name:
+          type: string
+          example: Speedball
+        organizer:
+          $ref: "#/components/schemas/EventOrganizer"
+        offers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Offer"
+        "beta:orderPostUrl":
+          type: string
+          example: https://example.com/orders
+          format: uri
+          description: >-
+            This is the URL to which an order can be POSTed in order
+            to add it to an order. By default, a lease for the order
+            will be 180 seconds unless otherwise specified in
+            `beta:anonymousLeaseDuration`.
+        "beta:anonymousLeaseDuration":
+          type: string
+          example: "PT15M"
+          description: >-
+            When an order is posted to `beta:orderPostUrl`, the
+            default lease time will be 180 seconds unless this field
+            is set.
+        eventStatus:
+          type: string
+          example: http://schema.org/EventScheduled
+          enum:
+            - http://schema.org/EventCancelled
+            - http://schema.org/EventPostponed
+            - http://schema.org/EventRescheduled
+            - http://schema.org/EventScheduled
+        maximumAttendeeCapacity:
+          type: number
+          example: 30
+        remainingAttendeeCapacity:
+          type: number
+          example: 20
+        activity:
+          type: object
+          properties:
+            type:
+              type: string
+              example: Concept
+              pattern: "^Concept$"
+            id:
+              type: string
+              example: https://example.com/reference/activities#Speedball
+              format: uri
+            prefLabel:
+              type: string
+              example: Speedball
+            inScheme:
+              type: string
+              format: uri
+              example: https://example.com/reference/activities
+        description:
+          type: string
+          example: >-
+            An action packed, fast paced game that incorporates
+            netball, handball and football.
+        startDate:
+          type: string
+          example: '2018-01-27T11:00:00Z'
+          format: date-time
+        endDate:
+          type: string
+          example: '2018-01-27T12:00:00Z'
+          format: date-time
+        duration:
+          type: string
+          example: PT1H
+          description: Duration of the event.
+        location:
+          $ref: "#/components/schemas/Place"
+        leader:
+          $ref: "#/components/schemas/Person"
+        ageRange:
+          type: string
+          example: 16-55
+          description: A suitable age range for an event.
+        sameAs:
+          type: array
+          description: >-
+            URL of a reference Web page that unambiguously indicates
+            the item's identity. E.g. the URL of the item's Wikipedia
+            page, Wikidata entry, or official website.
+          items:
+            type: string
+            format: uri
+            example:
+              - http://www.facebook.com/speedball
+              - https://www.twitter.com/speedball
+              - http://www.speedball-world.com
+
+    OrderedEvent:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Event
+        identifier:
+          type: integer
+          example: 9209
+        id:
+          type: string
+          example: https://example.com/sessions/9209
+          format: uri
+        organizer:
+          $ref: "#/components/schemas/EventOrganizer"
+        customer:
+          $ref: "#/components/schemas/Customer"
+        name:
+          type: string
+          example: Speedball
+        description:
+          type: string
+          example: >-
+            An action packed, fast paced game that incorporates
+            netball, handball and football.
+        startDate:
+          type: string
+          example: '2018-01-27T11:00:00Z'
+          format: date-time
+        acceptedOffer:
+          example: "https://example.com/sessions/9209#!/offer/2134"
+          type: string
+          format: uri
+
+    RequestDiscount:
+      type: array
+      description: >-
+        A cut-down discount object that's used to let a seller know
+        that a discount code is being applied.
+      items:
+        type: object
+        properties:
+          type:
+            type: string
+            example: Discount
+            pattern: "^Discount$"
+          discountCode:
+            type: string
+            example: ABCD1234
+            description: >-
+              A code that represents a discount that a customer might
+              have access to and want to apply to an order.
+
+    Person:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Person
+        givenName:
+          type: string
+          example: Nicole
+        familyName:
+          type: string
+          example: Smith
+        id:
+          type: string
+          example: https://example.com/locations/1234ABCD/leaders/89
+        identifier:
+          type: string
+          example: 89
+
+    Category:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Concept
+        prefLabel:
+          type: string
+          example: Top Club Level
+
+    Activity:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Concept
+        prefLabel:
+          type: string
+          example: Ball Games
+        narrower:
+          type: object
+          required:
+            - prefLabel
+          properties:
+            type:
+              type: string
+              example: Concept
+              pattern: "^Concept$"
+            id:
+              type: string
+              format: uri
+              example: https://example.com/reference/activities#Speedball
+            prefLabel:
+              type: string
+              example: Speedball
+            altLabel:
+              type: string
+              example: Speedball
+
+    PagedEventList:
+      type: object
+      required:
+        - next
+        - items
+        - license
+      properties:
+        next:
+          type: string
+          format: uri
+          example: https://example.com/sessions?afterId=100&afterTimestamp=3887825979
+          description: >-
+            The next URL is a precomputed URL to be called by the data
+            consumer (System 2) to get the next page of data. The next
+            URL must be calculated from the last item used to generate
+            the current page, and use the current page's own URL if no
+            items exist. Not all items in the current page may be
+            visible in the case of filtering so the last item used may
+            not be contained within items. The next URL must be an
+            absolute URL. Note "polling" and "paging" are
+            differentiated only by the duration between
+            requests.
+        license:
+          type: string
+          format: uri
+          example: https://creativecommons.org/licenses/by/4.0/
+          description: >-
+            Reference to the license under which the data has been
+            published. Any website that links to this endpoint should
+            also include text such as "This opportunity data is owned
+            by My Company Ltd and is licensed under the Creative
+            Commons Attribution Licence (CC-BY v4.0) for anyone to
+            access, use and share.".
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ItemEnvelope"
+          description: >-
+            An array of `item`. This should simply be empty [] if no
+            results are returned. The items property being empty is
+            not sufficient to indicate the last page.
+
+    CategoryList:
+      type: object
+      properties:
+        type:
+          type: string
+          example: ConceptScheme
+          pattern: "^ConceptScheme$"
+        url:
+          type: string
+          example: http://www.example.org/categories
+        title:
+          type: string
+          example: Category List
+        concepts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+
+    ActivityList:
+      type: object
+      properties:
+        type:
+          type: string
+          example: ConceptScheme
+          pattern: "^ConceptScheme$"
+        url:
+          type: string
+          example: http://www.example.org/activities
+        title:
+          type: string
+          example: Activity List
+        concepts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Activity"
+
+    Place:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "https://example.com/locations/1234ABCD"
+          format: uri
+        identifier:
+          type: string
+          example: 1234ABCD
+        name:
+          type: string
+          example: Raynes Park High School
+        type:
+          type: string
+          example: Place
+          pattern: "^Place$"
+        telephone:
+          type: string
+          example: 01253 473934
+        geo:
+          required:
+            - type
+            - latitude
+            - longitude
+          type: object
+          properties:
+            type:
+              type: string
+              example: GeoCoordinates
+              pattern: "^GeoCoordinates$"
+            latitude:
+              type: number
+              example: 51.4034423828125
+            longitude:
+              type: number
+              example: -0.2369088977575302
+        address:
+          type: object
+          properties:
+            type:
+              type: string
+              example: PostalAddress
+            streetAddress:
+              type: string
+              example: Raynes Park High School, 46A West Barnes Lane
+            addressLocality:
+              type: string
+              example: New Malden
+            addressRegion:
+              type: string
+              example: London
+            postalCode:
+              type: string
+              example: NW5 3DU
+
+    ResponseDiscount:
+      type: array
+      description: >-
+        A more detailed discount object that provides more details
+        about the discount being applied.
+      items:
+        type: object
+        properties:
+          type:
+            type: string
+            example: Discount
+            pattern: "^Discount$"
+          identifier:
+            type: string
+            example: ZXCVB1234
+          discountCode:
+            type: string
+            example: ABCD1234
+          amount:
+            type: object
+            properties:
+              type:
+                type: string
+                example: MonetaryAmount
+              value:
+                type: string
+                example: "5.00"
+              currency:
+                type: string
+                example: GBP
+
+  requestBodies:
+    postPayment:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                type: string
+                pattern: "^Invoice$"
+                example: Invoice
+              paymentMethod:
+                type: string
+                format: uri
+                example: http://purl.org/goodrelations/v1#Stripe
+              totalPaidToProvider:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: MonetaryAmount
+                  value:
+                    type: string
+                    example: '8.00'
+                  currency:
+                    type: string
+                    example: GBP
+              totalPaidByCustomer:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: MonetaryAmount
+                  value:
+                    type: string
+                    example: '5.00'
+                  currency:
+                    type: string
+                    example: GBP
+
+    postOrderItem:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - acceptedOffer
+              - customer
+              - orderQuantity
+            properties:
+              type:
+                type: string
+                example: OrderItem
+                pattern: "^OrderItem$"
+              orderQuantity:
+                type: integer
+                example: 1
+              customer:
+                $ref: "#/components/schemas/Customer"
+              acceptedOffer:
+                example: "https://example.com/sessions/9209#!/offer/2134"
+                type: string
+                format: uri
+              orderedItem:
+                example: "https://example.com/sessions/9209"
+                type: string
+                format: uri
+
+    postOrder:
+      description: Order object that needs to be added to the store
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - broker
+              - orderedItem
+              - customer
+            properties:
+              type:
+                type: string
+                pattern: "^Order$"
+              customer:
+                $ref: "#/components/schemas/Customer"
+              broker:
+                $ref: "#/components/schemas/BrokerOrganization"
+              orderedItem:
+                $ref: "#/components/schemas/OrderedEvent"
+              discount:
+                $ref: "#/components/schemas/RequestDiscount"
