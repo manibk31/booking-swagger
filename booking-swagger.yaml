@@ -610,6 +610,24 @@ components:
         remainingAttendeeCapacity:
           type: number
           example: 20
+        category:
+          type: object
+          properties:
+            type:
+              type: string
+              example: Concept
+              pattern: "^Concept$"
+            id:
+              type: string
+              example: https://example.com/reference/categories#Top%20Club%20Level
+              format: uri
+            prefLabel:
+              type: string
+              example: Top Club Level
+            inScheme:
+              type: string
+              format: uri
+              example: https://example.com/reference/categories
         activity:
           type: object
           properties:
@@ -748,6 +766,10 @@ components:
         prefLabel:
           type: string
           example: Top Club Level
+        id:
+          type: string
+          format: uri
+          example: https://example.com/reference/categories#Top%20Club%20Level
 
     Activity:
       type: object
