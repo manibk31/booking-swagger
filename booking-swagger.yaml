@@ -28,11 +28,13 @@ tags:
   description: Modelling Opportunity Data v1.0
 
 paths:
-  /sessions:
+  /feed/sessions:
     get:
       tags:
         - Sessions
-      summary: List all events.
+      summary: >-
+        List all events with the ODI Real Time Paging Specification
+        wrapper.
       responses:
         200:
           description: OK
@@ -40,6 +42,67 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PagedEventList"
+
+  /sessions:
+    get:
+      parameters:
+        - name: next
+          in: query
+          description: For pagination, the id of the next page to fetch.
+          example: 10000
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: For pagination, fetch no more than this number of items.
+          example: 100
+          schema:
+            type: string
+        - name: dateFrom
+          in: query
+          description: Sessions should start after this date.
+          example: "2018-03-26T13:04:42.039Z"
+          schema:
+            format: date-time
+            type: string
+        - name: dateEnd
+          in: query
+          description: Sessions should finish before this date.
+          example: "2018-03-26T13:04:42.039Z"
+          schema:
+            type: string
+            format: date-time
+        - name: timeStartFrom
+          in: query
+          description: Sessions should start after this time.
+          example: "2018-03-26T13:04:42.039Z"
+          schema:
+            format: date-time
+            type: string
+        - name: timeStartEnd
+          in: query
+          description: Sessions should finish before this time.
+          example: "2018-03-26T13:04:42.039Z"
+          schema:
+            format: date-time
+            type: string
+        - name: gender
+          in: query
+          description: Filter results to those suitable for given gender.
+          example: male
+          schema:
+            type: string
+      tags:
+        - Sessions
+      summary: >-
+        A queriable interface for sessions.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JsonApiPagedEventList"
 
   /sessions/{sessionId}:
     get:
@@ -204,7 +267,7 @@ paths:
       tags:
         - Orders
       summary: Fetches an order with all of its items included.
-      description: Fetches an order with all of its items included. 
+      description: Fetches an order with all of its items included.
       responses:
         200:
           description: OK
@@ -455,25 +518,12 @@ components:
           example: Winger space for Speedball.
 
     Customer:
-      type: object
+      type: string
       description: |
         Details for a customer that can be passed to a seller to
         create an account. Once the account is created, a customer
         can be represented as a URI.
-      properties:
-        type:
-          type: string
-          pattern: "^Customer$"
-        givenName:
-          type: string
-          example: Joe
-        familyName:
-          type: string
-          example: Bloggs
-        email:
-          type: string
-          format: email
-          example: joe@example.com
+      format: uri
 
     BrokerOrganization:
       type: object
@@ -556,7 +606,7 @@ components:
             an item may not be included in `items` if it is filtered
             out). The format of the modified property and the relevant
             URL parameter must be identical.
-        data:
+        results:
           type: array
           items:
             $ref: "#/components/schemas/FullEvent"
@@ -809,6 +859,29 @@ components:
             altLabel:
               type: string
               example: Speedball
+
+    JsonApiPagedEventList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: uri
+              example: https://example.com/sessions
+            next:
+              type: string
+              format: uri
+              example: https://example.com/sessions?next=9210
+            last:
+              type: string
+              format: uri
+              example: https://example.com/sessions?next=20000
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullEvent"
 
     PagedEventList:
       type: object
