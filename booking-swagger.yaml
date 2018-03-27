@@ -29,6 +29,8 @@ tags:
 
 paths:
   /feed/sessions:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
     get:
       tags:
         - Sessions
@@ -44,6 +46,8 @@ paths:
                 $ref: "#/components/schemas/PagedEventList"
 
   /sessions:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
     get:
       parameters:
         - name: next
@@ -105,6 +109,8 @@ paths:
                 $ref: "#/components/schemas/JsonApiPagedEventList"
 
   /sessions/{sessionId}:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
     get:
       tags:
         - Sessions
@@ -118,6 +124,8 @@ paths:
                 $ref: "#/components/schemas/FullEvent"
 
   /categories:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
     get:
       tags:
         - Categories
@@ -131,6 +139,8 @@ paths:
                 $ref: "#/components/schemas/CategoryList"
 
   /activities:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
     get:
       tags:
         - Activities
@@ -144,6 +154,8 @@ paths:
                 $ref: "#/components/schemas/ActivityList"
 
   /locations:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
     get:
       tags:
         - Locations
@@ -163,6 +175,7 @@ paths:
 
   /locations/{locationID}:
     parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
       - $ref: "#/components/parameters/locationId"
     get:
       tags:
@@ -190,6 +203,7 @@ paths:
 
   /locations/{locationID}/leaders:
     parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
       - $ref: "#/components/parameters/locationId"
     get:
       tags:
@@ -210,6 +224,7 @@ paths:
 
   /locations/{locationID}/leaders/{leaderId}:
     parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
       - $ref: "#/components/parameters/leaderId"
       - $ref: "#/components/parameters/locationId"
     get:
@@ -226,27 +241,12 @@ paths:
 
   /orders:
     parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
       - $ref: "#/components/parameters/OnBehalfOfContactHeader"
     description: >-
       Creates a new order. It's not unreasonable to think of this
       endpoint as a basket and the following operations will act upon
       that basket.
-    get:
-      tags:
-        - Orders
-      summary: List all orders.
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  orderItem:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/EntireOrder"
     post:
       tags:
         - Orders
@@ -280,6 +280,7 @@ paths:
 
   /orders/{orderId}:
     parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
       - $ref: "#/components/parameters/orderId"
       - $ref: "#/components/parameters/OnBehalfOfContactHeader"
     get:
@@ -317,6 +318,7 @@ paths:
 
   /orders/{orderId}/ordereditems:
     parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
       - $ref: "#/components/parameters/OnBehalfOfContactHeader"
       - $ref: "#/components/parameters/orderId"
     post:
@@ -351,6 +353,7 @@ paths:
 
   /orders/{orderId}/ordereditems/{itemId}:
     parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
       - $ref: "#/components/parameters/OnBehalfOfContactHeader"
       - $ref: "#/components/parameters/orderId"
       - $ref: "#/components/parameters/itemId"
@@ -371,6 +374,7 @@ paths:
   /orders/{orderId}/payment:
     parameters:
       - $ref: "#/components/parameters/OnBehalfOfContactHeader"
+      - $ref: "#/components/parameters/LocaleHeader"
     post:
       tags:
         - Orders
@@ -395,6 +399,14 @@ paths:
 
 components:
   parameters:
+    LocaleHeader:
+      name: Accept-Language
+      description: ISO Format
+      in: header
+      schema:
+        example: en
+        type: string
+      required: false
     OnBehalfOfContactHeader:
       name: X-On-Behalf-Of
       description: "Contact identifier"
