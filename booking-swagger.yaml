@@ -879,7 +879,7 @@ components:
               type: string
               format: uri
               example: https://example.com/sessions?next=20000
-        data:
+        results:
           type: array
           items:
             $ref: "#/components/schemas/FullEvent"
