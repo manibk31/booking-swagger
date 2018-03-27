@@ -690,6 +690,18 @@ components:
         priceCurrency:
           type: string
           example: GBP
+        availabilityStarts:
+          description: >-
+            The beginning of the availability of the product or
+            service included in the offer.
+          example: "2014-04-29T12:14:35"
+          format: date-time
+        availabilityEnds:
+          description: >-
+            The end of the availability of the product or service
+            included in the offer.
+          example: "2014-04-29T12:14:35"
+          format: date-time
         description:
           type: string
           example: Winger space for Speedball.
