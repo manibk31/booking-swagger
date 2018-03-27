@@ -1,4 +1,4 @@
-# -*- mode: OpenAPI-YAML -*-
+# -*- Fix up booking items.# -*- mode: OpenAPI-YAML -*-
 
 openapi: 3.0.0
 servers:
@@ -106,7 +106,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JsonApiPagedBookingList"
+                type: object
+                properties:
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: uri
+                        example: https://example.com/customers/472/bookings
+                      next:
+                        type: string
+                        format: uri
+                        example: https://example.com/customers/472/bookings?next=9210
+                      last:
+                        type: string
+                        format: uri
+                        example: https://example.com/customers/472/bookings?next=20000
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FullEvent"
 
   /sessions/{sessionId}:
     parameters:
@@ -253,7 +273,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Person"
 
-  /customers/{customerId}/bookings:
+  /customers/{customerId}/reservations:
     parameters:
       - $ref: "#/components/parameters/LocaleHeader"
       - $ref: "#/components/parameters/OnBehalfOfContactHeader"
@@ -278,19 +298,20 @@ paths:
                       self:
                         type: string
                         format: uri
-                        example: https://example.com/customers/472/bookings
+                        example: https://example.com/customers/472/reservations
                       next:
                         type: string
                         format: uri
-                        example: https://example.com/customers/472/bookings?next=9210
+                        example: https://example.com/customers/472/reservations?next=9210
                       last:
                         type: string
                         format: uri
-                        example: https://example.com/customers/472/bookings?next=20000
+                        example: https://example.com/customers/472/reservations?next=20000
                   data:
                     type: array
                     items:
                       $ref: "#/components/schemas/BookingWithEvent"
+
   /orders:
     parameters:
       - $ref: "#/components/parameters/LocaleHeader"
@@ -724,7 +745,7 @@ components:
         customer:
           $ref: "#/components/schemas/Customer"
         acceptedOffer:
-          example: "https://example.com/sessions/9209#/offer/2134"
+          example: "https://example.com/sessions/9209"
           type: string
           format: uri
         orderedItem:
@@ -1066,7 +1087,7 @@ components:
           example: '2018-01-27T11:00:00Z'
           format: date-time
         acceptedOffer:
-          example: "https://example.com/sessions/9209#/offer/2134"
+          example: "https://example.com/sessions/9209"
           type: string
           format: uri
 
@@ -1150,29 +1171,6 @@ components:
             altLabel:
               type: string
               example: Speedball
-
-    JsonApiPagedBookingList:
-      type: object
-      properties:
-        links:
-          type: object
-          properties:
-            self:
-              type: string
-              format: uri
-              example: https://example.com/customers/472/bookings
-            next:
-              type: string
-              format: uri
-              example: https://example.com/customers/472/bookings?next=9210
-            last:
-              type: string
-              format: uri
-              example: https://example.com/customers/472/bookings?next=20000
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/FullEvent"
 
     JsonApiPagedEventList:
       type: object
