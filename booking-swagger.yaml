@@ -581,8 +581,36 @@ components:
       description: Identifies the location.
 
   schemas:
-    PotentialActions:
+    PotentialAction:
       type: object
+      properties:
+        type:
+          example: ReserveAction
+          pattern: "^ReserveAction$"
+          type: string
+        name:
+          type: string
+          example: Book
+        target:
+          type: object
+          properties:
+            type:
+              example: EntryPoint
+              pattern: "^EntryPoint$"
+              type: string
+            url:
+              example: http://example.com/sessions/12/
+              type: string
+              format: uri
+            httpMethod:
+              example: POST
+              type: string
+              enum:
+                - POST
+                - GET
+                - HEAD
+                - PATCH
+                - PUT
 
     categoryProp:
       type: object
@@ -1019,6 +1047,8 @@ components:
           example: Speedball
         organizer:
           $ref: "#/components/schemas/EventOrganizer"
+        potentialAction:
+          $ref: "#/components/schemas/PotentialAction"
         offers:
           type: array
           items:
