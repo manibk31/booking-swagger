@@ -211,7 +211,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'  
+                $ref: '#/components/schemas/ErrorResponse'
 
   /locations/{locationID}/leaders:
     parameters:
@@ -380,7 +380,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'  
+                $ref: '#/components/schemas/ErrorResponse'
 
   /orders/{orderId}/ordereditems/{itemId}:
     parameters:
@@ -426,7 +426,7 @@ paths:
           content:
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'  
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   parameters:
@@ -512,7 +512,7 @@ components:
             the problem type (e.g., using HTML
             [W3C.REC-html5-20141028]). When this member is not
             present, its value is assumed to be "about:blank".
-        title: 
+        title:
           type: string
           description: >-
             A short, human-readable summary of the problem type. It
@@ -772,7 +772,7 @@ components:
             The state property must be of value "updated" or value
             "deleted". Deleted items are included in the response with
             a "deleted" state, but no `data` associated.
-        kind :
+        kind:
           type: string
           example: session
         modified:
