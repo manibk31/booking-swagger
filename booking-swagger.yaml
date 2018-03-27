@@ -175,8 +175,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Place"
-        404:
-          description: Given orderId doesn't exist.
+        404-NotFound:
+          description: "NOT FOUND"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        400-BadRequest:
+          description: "BAD REQUEST"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'  
 
   /locations/{locationID}/leaders:
     parameters:
@@ -284,8 +294,13 @@ paths:
             application/json:
               schema:
                $ref: "#/components/schemas/EntireOrder"
-        404:
-          description: Given orderId doesn't exist.
+        404-NotFound:
+          description: "NOT FOUND"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
     delete:
       tags:
         - Orders
@@ -293,8 +308,12 @@ paths:
       responses:
         204:
           description: No Content
-        404:
-          description: Given orderId doesn't exist.
+        404-NotFound:
+          description: "NOT FOUND"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /orders/{orderId}/ordereditems:
     parameters:
@@ -317,8 +336,18 @@ paths:
                 type: string
                 example: /orders/535/ordereditems/987
                 format: uri
-        404:
-          description: Given orderId doesn't exist.
+        404-NotFound:
+          description: "NOT FOUND"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        400-BadRequest:
+          description: "BAD REQUEST"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'  
 
   /orders/{orderId}/ordereditems/{itemId}:
     parameters:
@@ -332,8 +361,12 @@ paths:
       responses:
         204:
           description: No Content
-        404:
-          description: Given orderId or itemId doesn't exist.
+        404-NotFound:
+          description: "NOT FOUND"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /orders/{orderId}/payment:
     parameters:
@@ -342,13 +375,23 @@ paths:
       tags:
         - Orders
       summary: Make a payment on an order.
+      requestBody:
+        $ref: "#/components/requestBodies/postPayment"
       responses:
         201:
           description: Created
-        404:
-          description: Given orderId doesn't exist.
-      requestBody:
-        $ref: "#/components/requestBodies/postPayment"
+        404-NotFound:
+          description: "NOT FOUND"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        400-BadRequest:
+          description: "BAD REQUEST"
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'  
 
 components:
   parameters:
@@ -390,6 +433,22 @@ components:
       description: Identifies the location.
 
   schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+        title:
+          type: string
+        userMessage:
+          type: string
+        developerMessage:
+          type: string
+        requestId:
+          description: Used by technical support for diagnostics purposes.
+          type: string
+          format: uuid
+
     EntireOrder:
       type: object
       properties:
