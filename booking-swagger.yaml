@@ -168,18 +168,20 @@ paths:
               schema:
                 type: object
                 properties:
-                  self:
-                    type: string
-                    format: uri
-                    example: https://example.com/locations
-                  next:
-                    type: string
-                    format: uri
-                    example: https://example.com/locations?next=9210
-                  last:
-                    type: string
-                    format: uri
-                    example: https://example.com/locations?next=20000
+                  links:
+                    properties:
+                      self:
+                        type: string
+                        format: uri
+                        example: https://example.com/locations
+                      next:
+                        type: string
+                        format: uri
+                        example: https://example.com/locations?next=9210
+                      last:
+                        type: string
+                        format: uri
+                        example: https://example.com/locations?next=20000
                   data:
                     type: array
                     items:
@@ -271,22 +273,24 @@ paths:
               schema:
                 type: object
                 properties:
-                  self:
-                    type: string
-                    format: uri
-                    example: https://example.com/customers/472/bookings
-                  next:
-                    type: string
-                    format: uri
-                    example: https://example.com/customers/472/bookings?next=9210
-                  last:
-                    type: string
-                    format: uri
-                    example: https://example.com/customers/472/bookings?next=20000
+                  links:
+                    properties:
+                      self:
+                        type: string
+                        format: uri
+                        example: https://example.com/customers/472/bookings
+                      next:
+                        type: string
+                        format: uri
+                        example: https://example.com/customers/472/bookings?next=9210
+                      last:
+                        type: string
+                        format: uri
+                        example: https://example.com/customers/472/bookings?next=20000
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/FullEventWithBooking"
+                      $ref: "#/components/schemas/BookingWithEvent"
   /orders:
     parameters:
       - $ref: "#/components/parameters/LocaleHeader"
@@ -860,103 +864,78 @@ components:
             Note this property must not be included if `state` is
             "deleted".
 
-    FullEventWithBooking:
-      type: object
+    BookingWithEvent:
       properties:
         "@context":
-            type: string
-            format: uri
-            example: https://www.openactive.io/ns/oa.jsonld
+          type: string
+          format: uri
+          example: https://www.openactive.io/ns/oa.jsonld
         type:
           type: string
-          example: Event
-        identifier:
-          type: integer
-          example: 9209
+          pattern: "^EventReservation$"
+          example: EventReservation
         id:
           type: string
-          example: https://example.com/sessions/9209
           format: uri
-        name:
+          example: https://www.example.com/customers/472/reservations/9765
+        identifier:
           type: string
-          example: Speedball
-        organizer:
-          $ref: "#/components/schemas/EventOrganizer"
-        category:
-          $ref: "#/components/schemas/categoryProp"
-        activity:
-          $ref: "#/components/schemas/activityProp"
-        "beta:waitingListCount":
-          type: number
-          example: 12
-        hasReservation:
-          type: array
-          items:
-            properties:
-              type:
-                type: string
-                pattern: "^EventReservation$"
-                example: EventReservation
-              identifier:
-                type: string
-                example: 9765
-              partOfOrder:
-                type: string
-                format: uri
-                example: https://example.com/sessions/9209
-              underPerson:
-                $ref: "#/components/schemas/Customer"
-              reservationStatus:
-                type: string
-                example: http://schema.org/ReservationConfirmed
-                format: uri
-              description:
-                type: string
-                example: Event successfully booked.
-              "beta:cancelUntil":
-                type: string
-                format: date-time
-                example: "2018-03-27T11:18:55.181Z"
-              totalPrice:
-                example: "10.00"
-                format: string
-              priceCurrency:
-                example: GBP
-                format: string
+          example: 9765
+        underName:
+          $ref: "#/components/schemas/Customer"
+        reservationStatus:
+          type: string
+          example: http://schema.org/ReservationConfirmed
+          format: uri
         description:
           type: string
-          example: >-
-            An action packed, fast paced game that incorporates
-            netball, handball and football.
-        startDate:
+          example: Event successfully booked.
+        "beta:cancelUntil":
           type: string
-          example: '2018-01-27T11:00:00Z'
           format: date-time
-        endDate:
+          example: "2018-03-27T11:18:55.181Z"
+        totalPrice:
+          example: "10.00"
+          format: string
+        priceCurrency:
+          example: GBP
+          format: string
+        partOfOrder:
           type: string
-          example: '2018-01-27T12:00:00Z'
-          format: date-time
-        duration:
-          type: string
-          example: PT1H
-          description: Duration of the event.
-        location:
-          $ref: "#/components/schemas/Place"
-        leader:
-          $ref: "#/components/schemas/Person"
-        sameAs:
-          type: array
-          description: >-
-            URL of a reference Web page that unambiguously indicates
-            the item's identity. E.g. the URL of the item's Wikipedia
-            page, Wikidata entry, or official website.
-          items:
-            type: string
-            format: uri
-            example:
-              - http://www.facebook.com/speedball
-              - https://www.twitter.com/speedball
-              - http://www.speedball-world.com
+          format: uri
+          example: https://example.com/sessions/9209
+        reservationFor:
+          type: object
+          properties:
+            type:
+              type: string
+              example: Event
+            identifier:
+              type: integer
+              example: 9209
+            id:
+              type: string
+              example: https://example.com/sessions/9209
+              format: uri
+            name:
+              type: string
+              example: Speedball
+            startDate:
+              type: string
+              example: '2018-01-27T11:00:00Z'
+              format: date-time
+            endDate:
+              type: string
+              example: '2018-01-27T12:00:00Z'
+              format: date-time
+            duration:
+              type: string
+              example: PT1H
+              description: Duration of the event.
+            location:
+              $ref: "#/components/schemas/Place"
+            leader:
+              $ref: "#/components/schemas/Person"
 
     FullEvent:
       type: object
