@@ -772,7 +772,7 @@ components:
             an item may not be included in `items` if it is filtered
             out). The format of the modified property and the relevant
             URL parameter must be identical.
-        results:
+        data:
           type: array
           items:
             $ref: "#/components/schemas/FullEvent"
@@ -1044,7 +1044,7 @@ components:
               type: string
               format: uri
               example: https://example.com/customers/472/bookings?next=20000
-        results:
+        data:
           type: array
           items:
             $ref: "#/components/schemas/FullEvent"
@@ -1067,7 +1067,7 @@ components:
               type: string
               format: uri
               example: https://example.com/sessions?next=20000
-        results:
+        data:
           type: array
           items:
             $ref: "#/components/schemas/FullEvent"
