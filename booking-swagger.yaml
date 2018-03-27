@@ -269,7 +269,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JsonApiPagedEventList"
+                type: object
+                properties:
+                  self:
+                    type: string
+                    format: uri
+                    example: https://example.com/customers/472/bookings
+                  next:
+                    type: string
+                    format: uri
+                    example: https://example.com/customers/472/bookings?next=9210
+                  last:
+                    type: string
+                    format: uri
+                    example: https://example.com/customers/472/bookings?next=20000
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FullEventWithBooking"
   /orders:
     parameters:
       - $ref: "#/components/parameters/LocaleHeader"
@@ -500,6 +517,45 @@ components:
       description: Identifies the location.
 
   schemas:
+    PotentialActions:
+      type: object
+
+    categoryProp:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Concept
+          pattern: "^Concept$"
+        id:
+          type: string
+          example: https://example.com/reference/categories#Top%20Club%20Level
+          format: uri
+        prefLabel:
+          type: string
+          example: Top Club Level
+        inScheme:
+          type: string
+          format: uri
+          example: https://example.com/reference/categories
+    activityProp:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Concept
+          pattern: "^Concept$"
+        id:
+          type: string
+          example: https://example.com/reference/activities#Speedball
+          format: uri
+        prefLabel:
+          type: string
+          example: Speedball
+        inScheme:
+          type: string
+          format: uri
+          example: https://example.com/reference/activities
     ErrorResponse:
       type: object
       properties:
@@ -804,6 +860,104 @@ components:
             Note this property must not be included if `state` is
             "deleted".
 
+    FullEventWithBooking:
+      type: object
+      properties:
+        "@context":
+            type: string
+            format: uri
+            example: https://www.openactive.io/ns/oa.jsonld
+        type:
+          type: string
+          example: Event
+        identifier:
+          type: integer
+          example: 9209
+        id:
+          type: string
+          example: https://example.com/sessions/9209
+          format: uri
+        name:
+          type: string
+          example: Speedball
+        organizer:
+          $ref: "#/components/schemas/EventOrganizer"
+        category:
+          $ref: "#/components/schemas/categoryProp"
+        activity:
+          $ref: "#/components/schemas/activityProp"
+        "beta:waitingListCount":
+          type: number
+          example: 12
+        hasReservation:
+          type: array
+          items:
+            properties:
+              type:
+                type: string
+                pattern: "^EventReservation$"
+                example: EventReservation
+              identifier:
+                type: string
+                example: 9765
+              partOfOrder:
+                type: string
+                format: uri
+                example: https://example.com/sessions/9209
+              underPerson:
+                $ref: "#/components/schemas/Customer"
+              reservationStatus:
+                type: string
+                example: http://schema.org/ReservationConfirmed
+                format: uri
+              description:
+                type: string
+                example: Event successfully booked.
+              "beta:cancelUntil":
+                type: string
+                format: date-time
+                example: "2018-03-27T11:18:55.181Z"
+              totalPrice:
+                example: "10.00"
+                format: string
+              priceCurrency:
+                example: GBP
+                format: string
+        description:
+          type: string
+          example: >-
+            An action packed, fast paced game that incorporates
+            netball, handball and football.
+        startDate:
+          type: string
+          example: '2018-01-27T11:00:00Z'
+          format: date-time
+        endDate:
+          type: string
+          example: '2018-01-27T12:00:00Z'
+          format: date-time
+        duration:
+          type: string
+          example: PT1H
+          description: Duration of the event.
+        location:
+          $ref: "#/components/schemas/Place"
+        leader:
+          $ref: "#/components/schemas/Person"
+        sameAs:
+          type: array
+          description: >-
+            URL of a reference Web page that unambiguously indicates
+            the item's identity. E.g. the URL of the item's Wikipedia
+            page, Wikidata entry, or official website.
+          items:
+            type: string
+            format: uri
+            example:
+              - http://www.facebook.com/speedball
+              - https://www.twitter.com/speedball
+              - http://www.speedball-world.com
+
     FullEvent:
       type: object
       properties:
@@ -861,41 +1015,9 @@ components:
           type: number
           example: 20
         category:
-          type: object
-          properties:
-            type:
-              type: string
-              example: Concept
-              pattern: "^Concept$"
-            id:
-              type: string
-              example: https://example.com/reference/categories#Top%20Club%20Level
-              format: uri
-            prefLabel:
-              type: string
-              example: Top Club Level
-            inScheme:
-              type: string
-              format: uri
-              example: https://example.com/reference/categories
+          $ref: "#/components/schemas/categoryProp"
         activity:
-          type: object
-          properties:
-            type:
-              type: string
-              example: Concept
-              pattern: "^Concept$"
-            id:
-              type: string
-              example: https://example.com/reference/activities#Speedball
-              format: uri
-            prefLabel:
-              type: string
-              example: Speedball
-            inScheme:
-              type: string
-              format: uri
-              example: https://example.com/reference/activities
+          $ref: "#/components/schemas/activityProp"
         description:
           type: string
           example: >-
