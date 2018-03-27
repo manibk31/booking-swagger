@@ -445,8 +445,6 @@ components:
                   currency:
                     type: string
                     example: GBP
-              discount:
-                $ref: "#/components/schemas/ResponseDiscount"
               subTotalPrice:
                 type: object
                 properties:
@@ -1151,5 +1149,3 @@ components:
                 $ref: "#/components/schemas/BrokerOrganization"
               orderedItem:
                 $ref: "#/components/schemas/OrderedItem"
-              discount:
-                $ref: "#/components/schemas/RequestDiscount"
