@@ -168,7 +168,19 @@ paths:
               schema:
                 type: object
                 properties:
-                  location:
+                  self:
+                    type: string
+                    format: uri
+                    example: https://example.com/locations
+                  next:
+                    type: string
+                    format: uri
+                    example: https://example.com/locations?next=9210
+                  last:
+                    type: string
+                    format: uri
+                    example: https://example.com/locations?next=20000
+                  data:
                     type: array
                     items:
                       $ref: "#/components/schemas/Place"
