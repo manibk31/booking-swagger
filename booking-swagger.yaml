@@ -215,6 +215,8 @@ paths:
                 $ref: "#/components/schemas/Person"
 
   /orders:
+    parameters:
+      - $ref: "#/components/parameters/OnBehalfOfContactHeader"
     description: >-
       Creates a new order. It's not unreasonable to think of this
       endpoint as a basket and the following operations will act upon
@@ -257,12 +259,19 @@ paths:
       responses:
         201:
           description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+                example: /orders/535
+                format: uri
       requestBody:
         $ref: "#/components/requestBodies/postOrder"
 
   /orders/{orderId}:
     parameters:
       - $ref: "#/components/parameters/orderId"
+      - $ref: "#/components/parameters/OnBehalfOfContactHeader"
     get:
       tags:
         - Orders
@@ -289,6 +298,7 @@ paths:
 
   /orders/{orderId}/ordereditems:
     parameters:
+      - $ref: "#/components/parameters/OnBehalfOfContactHeader"
       - $ref: "#/components/parameters/orderId"
     post:
       tags:
@@ -301,11 +311,18 @@ paths:
       responses:
         201:
           description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+                example: /orders/535/ordereditems/987
+                format: uri
         404:
           description: Given orderId doesn't exist.
 
   /orders/{orderId}/ordereditems/{itemId}:
     parameters:
+      - $ref: "#/components/parameters/OnBehalfOfContactHeader"
       - $ref: "#/components/parameters/orderId"
       - $ref: "#/components/parameters/itemId"
     delete:
@@ -319,6 +336,8 @@ paths:
           description: Given orderId or itemId doesn't exist.
 
   /orders/{orderId}/payment:
+    parameters:
+      - $ref: "#/components/parameters/OnBehalfOfContactHeader"
     post:
       tags:
         - Orders
@@ -333,6 +352,14 @@ paths:
 
 components:
   parameters:
+    OnBehalfOfContactHeader:
+      name: X-On-Behalf-Of
+      description: "Contact identifier"
+      in: header
+      schema:
+        type: string
+        nullable: true
+      required: false
     itemId:
       in: path
       name: itemId
@@ -395,6 +422,13 @@ components:
                 type: string
                 example: OrderItem
                 pattern: "^OrderItem$"
+              id:
+                type: string
+                example: https://example.com/orders/535/orderitems/987
+                format: uri
+              identifier:
+                type: string
+                example: 987
               customer:
                 $ref: "#/components/schemas/Customer"
               orderedItem:
