@@ -106,7 +106,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/JsonApiPagedEventList"
+                $ref: "#/components/schemas/JsonApiPagedBookingList"
 
   /sessions/{sessionId}:
     parameters:
@@ -239,6 +239,25 @@ paths:
               schema:
                 $ref: "#/components/schemas/Person"
 
+  /customers/{customerId}/bookings:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
+      - $ref: "#/components/parameters/OnBehalfOfContactHeader"
+      - $ref: "#/components/parameters/CustomerIdRequired"
+      - $ref: "#/components/parameters/startDate"
+      - $ref: "#/components/parameters/endDate"
+    description: >-
+      A list of bookings for a given customer.
+    get:
+      tags:
+        - Customers
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JsonApiPagedEventList"
   /orders:
     parameters:
       - $ref: "#/components/parameters/LocaleHeader"
@@ -399,6 +418,30 @@ paths:
 
 components:
   parameters:
+    startDate:
+      in: query
+      name: startDate
+      schema:
+        type: string
+        example: '2018-02-20T11:00:00Z'
+        format: date-time
+      required: true
+    endDate:
+      in: query
+      name: endDate
+      schema:
+        type: string
+        example: '2018-02-20T11:00:00Z'
+        format: date-time
+      required: true
+    CustomerIdRequired:
+      name: customerId
+      description: Customer's identifier.
+      in: path
+      schema:
+        example: 472
+        type: string
+      required: true
     LocaleHeader:
       name: Accept-Language
       description: ISO Format
@@ -963,6 +1006,29 @@ components:
             altLabel:
               type: string
               example: Speedball
+
+    JsonApiPagedBookingList:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: uri
+              example: https://example.com/customers/472/bookings
+            next:
+              type: string
+              format: uri
+              example: https://example.com/customers/472/bookings?next=9210
+            last:
+              type: string
+              format: uri
+              example: https://example.com/customers/472/bookings?next=20000
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/FullEvent"
 
     JsonApiPagedEventList:
       type: object
