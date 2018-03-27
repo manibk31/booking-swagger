@@ -312,6 +312,45 @@ paths:
                     items:
                       $ref: "#/components/schemas/BookingWithEvent"
 
+  /customers/{customerId}/orders:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
+      - $ref: "#/components/parameters/OnBehalfOfContactHeader"
+      - $ref: "#/components/parameters/CustomerIdRequired"
+      - $ref: "#/components/parameters/startDate"
+      - $ref: "#/components/parameters/endDate"
+    description: >-
+      A list of bookings for a given customer.
+    get:
+      tags:
+        - Customers
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  links:
+                    properties:
+                      self:
+                        type: string
+                        format: uri
+                        example: https://example.com/customers/472/orders
+                      next:
+                        type: string
+                        format: uri
+                        example: https://example.com/customers/472/orders?next=9210
+                      last:
+                        type: string
+                        format: uri
+                        example: https://example.com/customers/472/orders?next=20000
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EntireOrder"
+
   /orders:
     parameters:
       - $ref: "#/components/parameters/LocaleHeader"
