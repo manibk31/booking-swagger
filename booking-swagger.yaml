@@ -23,7 +23,7 @@ tags:
 - name: Customers
   description: Booking Specification v0.4 (subset)
 - name: Reservations
-  description: Booking Specification v0.4 
+  description: Booking Specification v0.4
 - name: Orders
   description: Booking Specification v0.4
 - name: Activities
@@ -709,7 +709,7 @@ components:
             httpMethod:
               example: DELETE
               type: string
-  
+
     PayAction:
       type: object
       properties:
@@ -1603,7 +1603,7 @@ components:
             longitude:
               type: number
               example: -0.2369088977575302
-              
+
     PaymentMethod:
       type: object
       properties:
