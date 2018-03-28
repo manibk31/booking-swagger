@@ -1261,7 +1261,9 @@ components:
         location:
           $ref: "#/components/schemas/Place"
         facility:
-          $ref: "#/components/schemas/Facility"
+          type: array
+          items:
+            $ref: "#/components/schemas/Facility"
         leader:
           $ref: "#/components/schemas/Person"
         ageRange:
