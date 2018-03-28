@@ -20,6 +20,10 @@ tags:
   description: Modelling Opportunity Data v1.0
 - name: Sessions
   description: Modelling Opportunity Data v1.0
+- name: Customers
+  description: Booking Specification v0.4 (subset)
+- name: Reservations
+  description: Booking Specification v0.4 
 - name: Orders
   description: Booking Specification v0.4
 - name: Activities
