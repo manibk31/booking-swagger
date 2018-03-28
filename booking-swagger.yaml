@@ -1,14 +1,14 @@
-# -*- Fix up booking items.# -*- mode: OpenAPI-YAML -*-
+# -*- mode: OpenAPI-YAML -*-
 
 openapi: 3.0.0
 servers:
-  - description: ODI Booking API Draft
+  - description: OpenActive Booking API Draft
     url: https://virtserver.swaggerhub.com/theodi/booking-draft/1.0.0
 info:
   description: >-
     API specification for the current draft of the Booking API.
   version: "0.4"
-  title: Booking API
+  title: OpenActive Booking API
   contact:
     email: phil.jackson@theoodi.com
   license:
@@ -17,7 +17,7 @@ info:
 
 tags:
 - name: Locations
-  description: Beta.
+  description: Modelling Opportunity Data v1.0
 - name: Sessions
   description: Modelling Opportunity Data v1.0
 - name: Orders
@@ -65,37 +65,48 @@ paths:
         - name: dateFrom
           in: query
           description: Sessions should start after this date.
-          example: "2018-03-26T13:04:42.039Z"
+          example: "2018-03-26"
           schema:
             format: date-time
             type: string
         - name: dateEnd
           in: query
           description: Sessions should finish before this date.
-          example: "2018-03-26T13:04:42.039Z"
+          example: "2018-03-26"
           schema:
             type: string
             format: date-time
         - name: timeStartFrom
           in: query
           description: Sessions should start after this time.
-          example: "2018-03-26T13:04:42.039Z"
+          example: "13:04:42.039Z"
           schema:
             format: date-time
             type: string
         - name: timeStartEnd
           in: query
           description: Sessions should finish before this time.
-          example: "2018-03-26T13:04:42.039Z"
+          example: "13:04:42.039Z"
           schema:
             format: date-time
             type: string
-        - name: gender
+        - name: genderRestriction
           in: query
           description: Filter results to those suitable for given gender.
-          example: male
+          example: Female
           schema:
             type: string
+            enum:
+            - Male
+            - Female
+            - None
+        - name: dayOfWeek
+          in: query
+          description: Sessions should occur on these weekdays.
+          example: Monday
+          schema:
+            type: string
+            enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
       tags:
         - Sessions
       summary: >-
@@ -251,7 +262,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  leader:
+                  data:
                     type: array
                     items:
                       $ref: "#/components/schemas/Person"
@@ -272,6 +283,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Person"
+
+  /locations/{locationID}/facilities:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
+      - $ref: "#/components/parameters/locationId"
+    get:
+      tags:
+        - Locations
+      summary: Lists all facilities at a given location.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Facility"
 
   /customers/{customerId}/reservations:
     parameters:
@@ -311,6 +343,67 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/BookingWithEvent"
+
+  /customers/{customerId}/paymentmethods:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
+      - $ref: "#/components/parameters/OnBehalfOfContactHeader"
+      - $ref: "#/components/parameters/CustomerIdRequired"
+    description: >-
+      A list of stored payment methods for a given customer.
+    get:
+      tags:
+        - Customers
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PaymentMethod"
+
+
+  /reservations/{reservationId}:
+    parameters:
+      - $ref: "#/components/parameters/LocaleHeader"
+      - $ref: "#/components/parameters/reservationId"
+      - $ref: "#/components/parameters/OnBehalfOfContactHeader"
+    get:
+      tags:
+        - Reservations
+      summary: Fetches a reservation.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+               $ref: "#/components/schemas/BookingWithEvent"
+        404-NotFound:
+          description: NOT FOUND
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Reservations
+      summary: Delete an individual reservation.
+      responses:
+        204:
+          description: No Content
+        404-NotFound:
+          description: NOT FOUND
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /customers/{customerId}/orders:
     parameters:
@@ -483,7 +576,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /orders/{orderId}/payment:
+  /orders/{orderId}/payments:
     parameters:
       - $ref: "#/components/parameters/OnBehalfOfContactHeader"
       - $ref: "#/components/parameters/LocaleHeader"
@@ -551,6 +644,13 @@ components:
         type: string
         nullable: true
       required: false
+    reservationId:
+      in: path
+      name: reservationId
+      schema:
+        type: string
+      required: true
+      description: Identifies a specific reservation.
     itemId:
       in: path
       name: itemId
@@ -581,12 +681,61 @@ components:
       description: Identifies the location.
 
   schemas:
-    PotentialAction:
+    CancelAction:
+      type: object
+      properties:
+        type:
+          example: CancelAction
+          pattern: "^CancelAction"
+          type: string
+        name:
+          type: string
+          example: Cancel
+        target:
+          type: object
+          properties:
+            type:
+              example: EntryPoint
+              pattern: "^EntryPoint$"
+              type: string
+            url:
+              example: http://www.example.com/customers/12/reservations/134
+              type: string
+              format: uri
+            httpMethod:
+              example: DELETE
+              type: string
+  
+    PayAction:
+      type: object
+      properties:
+        type:
+          example: PayAction
+          pattern: "^PayAction"
+          type: string
+        name:
+          type: string
+          example: Pay
+        target:
+          type: object
+          properties:
+            type:
+              example: EntryPoint
+              pattern: "^EntryPoint$"
+              type: string
+            url:
+              example: https://example.com/orders/535/payment
+              type: string
+              format: uri
+            httpMethod:
+              $ref: '#/components/schemas/httpMethod'
+
+    ReserveAction:
       type: object
       properties:
         type:
           example: ReserveAction
-          pattern: "^ReserveAction$"
+          pattern: "^ReserveAction"
           type: string
         name:
           type: string
@@ -599,18 +748,21 @@ components:
               pattern: "^EntryPoint$"
               type: string
             url:
-              example: http://example.com/sessions/12/
+              example: https://example.com/orders
               type: string
               format: uri
             httpMethod:
-              example: POST
-              type: string
-              enum:
-                - POST
-                - GET
-                - HEAD
-                - PATCH
-                - PUT
+              $ref: '#/components/schemas/httpMethod'
+
+    httpMethod:
+      example: POST
+      type: string
+      enum:
+        - POST
+        - GET
+        - HEAD
+        - PATCH
+        - PUT
 
     categoryProp:
       type: object
@@ -697,16 +849,7 @@ components:
         identifier:
           type: integer
           example: 535
-        beta:paymentPostUrl:
-          type: string
-          example: "https://example.com/orders/535/payment"
-          format: uri
-          description: >-
-            This URL is the location that accepts payment
-            conformations as a POST. Once payment has been met, it is
-            up to the Seller to mark the `orderStatus` as
-            OrderDelivered.
-        orders:
+        orderedItem:
           type: array
           items:
             type: object
@@ -750,7 +893,6 @@ components:
                   currency:
                     type: string
                     example: GBP
-
         orderStatus:
           type: string
           example: OrderPaymentDue
@@ -794,6 +936,15 @@ components:
                 currency:
                   type: string
                   example: GBP
+        potentialAction:
+          type: array
+          items:
+            $ref: "#/components/schemas/PayAction"
+            description: >-
+              This URL is the location that accepts payment
+              conformations as a POST. Once payment has been met, it is
+              up to the Seller to mark the `orderStatus` as
+              OrderDelivered.
 
     OrderedItem:
       type: object
@@ -978,7 +1129,7 @@ components:
         description:
           type: string
           example: Event successfully booked.
-        "beta:cancelUntil":
+        "cancelUntil":
           type: string
           format: date-time
           example: "2018-03-27T11:18:55.181Z"
@@ -1024,6 +1175,10 @@ components:
               $ref: "#/components/schemas/Place"
             leader:
               $ref: "#/components/schemas/Person"
+        potentialAction:
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelAction"
 
     FullEvent:
       type: object
@@ -1047,21 +1202,10 @@ components:
           example: Speedball
         organizer:
           $ref: "#/components/schemas/EventOrganizer"
-        potentialAction:
-          $ref: "#/components/schemas/PotentialAction"
         offers:
           type: array
           items:
             $ref: "#/components/schemas/Offer"
-        "beta:orderPostUrl":
-          type: string
-          example: https://example.com/orders
-          format: uri
-          description: >-
-            This is the URL to which an order can be POSTed in order
-            to add it to an order. By default, a lease for the order
-            will be 180 seconds unless otherwise specified in
-            `beta:anonymousLeaseDuration`.
         "beta:anonymousLeaseDuration":
           type: string
           example: "PT15M"
@@ -1083,6 +1227,12 @@ components:
         remainingAttendeeCapacity:
           type: number
           example: 20
+        waitingListCount:
+          type: number
+          example: 10
+        genderRestriction:
+          type: string
+          example: http://openactive.io/ns#Female
         category:
           $ref: "#/components/schemas/categoryProp"
         activity:
@@ -1106,6 +1256,8 @@ components:
           description: Duration of the event.
         location:
           $ref: "#/components/schemas/Place"
+        facility:
+          $ref: "#/components/schemas/Facility"
         leader:
           $ref: "#/components/schemas/Person"
         ageRange:
@@ -1125,6 +1277,15 @@ components:
               - http://www.facebook.com/speedball
               - https://www.twitter.com/speedball
               - http://www.speedball-world.com
+        potentialAction:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReserveAction"
+            description: >-
+              This is the URL to which an order can be POSTed in order
+              to add it to an order. By default, a lease for the order
+              will be 180 seconds unless otherwise specified in
+              `beta:anonymousLeaseDuration`.
 
     OrderedEvent:
       type: object
@@ -1345,6 +1506,10 @@ components:
     Place:
       type: object
       properties:
+        type:
+          type: string
+          example: Place
+          pattern: "^Place$"
         id:
           type: string
           example: "https://example.com/locations/1234ABCD"
@@ -1358,10 +1523,6 @@ components:
         description:
           type: string
           example: Raynes Park High School in London
-        type:
-          type: string
-          example: Place
-          pattern: "^Place$"
         telephone:
           type: string
           example: 01253 473934
@@ -1400,6 +1561,70 @@ components:
             postalCode:
               type: string
               example: NW5 3DU
+
+    Facility:
+      type: object
+      properties:
+        type:
+          type: string
+          example: Place
+          pattern: "^Place$"
+        id:
+          type: string
+          example: "https://example.com/locations/1234ABCD/facilities/123"
+          format: uri
+        identifier:
+          type: string
+          example: 1234ABCD
+        name:
+          type: string
+          example: Swimming Pool
+        description:
+          type: string
+          example: Olympic length pool
+        geo:
+          required:
+            - type
+            - latitude
+            - longitude
+          type: object
+          properties:
+            type:
+              type: string
+              example: GeoCoordinates
+              pattern: "^GeoCoordinates$"
+            latitude:
+              type: number
+              example: 51.4034423828125
+            longitude:
+              type: number
+              example: -0.2369088977575302
+              
+    PaymentMethod:
+      type: object
+      properties:
+        type:
+          type: string
+          pattern: "^PaymentMethod"
+          example: PaymentMethod
+        id:
+          type: string
+          format: uri
+          example: https://www.example.com/customers/472/paymentmethods/9765
+        additionalType:
+          type: string
+          format: uri
+          example: http://purl.org/goodrelations/v1#CreditCard
+        name:
+          type: string
+          example: 'Primary credit card'
+        accountNumber:
+          type: string
+          example: '123456789'
+        expires:
+          type: string
+          example: '2018-02-20T11:00:00Z'
+          format: date-time
 
     ResponseDiscount:
       type: array
@@ -1441,36 +1666,12 @@ components:
             properties:
               type:
                 type: string
-                pattern: "^Invoice$"
-                example: Invoice
-              paymentMethod:
+                pattern: "^PaymentMethod"
+                example: PaymentMethod
+              id:
                 type: string
                 format: uri
-                example: http://purl.org/goodrelations/v1#Stripe
-              totalPaidToProvider:
-                type: object
-                properties:
-                  type:
-                    type: string
-                    example: MonetaryAmount
-                  value:
-                    type: string
-                    example: '8.00'
-                  currency:
-                    type: string
-                    example: GBP
-              totalPaidByCustomer:
-                type: object
-                properties:
-                  type:
-                    type: string
-                    example: MonetaryAmount
-                  value:
-                    type: string
-                    example: '5.00'
-                  currency:
-                    type: string
-                    example: GBP
+                example: https://www.example.com/customers/472/paymentmethods/9765
 
     postOrderItem:
       content:
