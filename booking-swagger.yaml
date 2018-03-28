@@ -35,12 +35,14 @@ paths:
   /feed/sessions:
     parameters:
       - $ref: "#/components/parameters/LocaleHeader"
+    description: >-
+      Returns a feed of events that are wrapped in the Realtime Paged
+      Data Exchange data-structures that make consuming the feed 
+      easy.
     get:
       tags:
         - Sessions
-      summary: >-
-        List all events with the ODI Real Time Paging Specification
-        wrapper.
+      summary: List all events in a real-time suitable format
       responses:
         200:
           description: OK
@@ -113,8 +115,7 @@ paths:
             enum: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
       tags:
         - Sessions
-      summary: >-
-        A queriable interface for sessions.
+      summary: A queriable interface for sessions
       responses:
         200:
           description: OK
@@ -149,7 +150,7 @@ paths:
     get:
       tags:
         - Sessions
-      summary: Details for a specific event.
+      summary: Details for a specific event
       responses:
         200:
           description: OK
@@ -164,7 +165,7 @@ paths:
     get:
       tags:
         - Categories
-      summary: List all categories as a controlled vocabulary.
+      summary: List all categories as a controlled vocabulary
       responses:
         200:
           description: OK
@@ -179,7 +180,7 @@ paths:
     get:
       tags:
         - Activities
-      summary: List all activities as a controlled vocabulary.
+      summary: List all activities as a controlled vocabulary
       responses:
         200:
           description: OK
@@ -194,7 +195,7 @@ paths:
     get:
       tags:
         - Locations
-      summary: List all locations.
+      summary: List all locations
       responses:
         200:
           description: OK
@@ -229,7 +230,7 @@ paths:
     get:
       tags:
         - Locations
-      summary: Returns information about a specific location.
+      summary: Returns information about a specific location
       responses:
         200:
           description: OK
@@ -257,7 +258,7 @@ paths:
     get:
       tags:
         - Locations
-      summary: Lists all leaders at a given location.
+      summary: Lists all leaders at a given location
       responses:
         200:
           description: OK
@@ -279,7 +280,7 @@ paths:
     get:
       tags:
         - Locations
-      summary: Information about a specific leader.
+      summary: Information about a specific leader
       responses:
         200:
           description: OK
@@ -295,7 +296,7 @@ paths:
     get:
       tags:
         - Locations
-      summary: Lists all facilities at a given location.
+      summary: Lists all facilities at a given location
       responses:
         200:
           description: OK
@@ -380,7 +381,7 @@ paths:
     get:
       tags:
         - Reservations
-      summary: Fetches a reservation.
+      summary: Fetches a reservation
       responses:
         200:
           description: OK
@@ -398,7 +399,7 @@ paths:
     delete:
       tags:
         - Reservations
-      summary: Delete an individual reservation.
+      summary: Delete an individual reservation
       responses:
         204:
           description: No Content
@@ -459,7 +460,7 @@ paths:
     post:
       tags:
         - Orders
-      summary: Reserve an Event’s space for a finite amount of time.
+      summary: Reserve an Event’s space for a finite amount of time
       description: >-
         Reserve an Event’s space for a finite amount of time.
 
@@ -495,8 +496,7 @@ paths:
     get:
       tags:
         - Orders
-      summary: Fetches an order with all of its items included.
-      description: Fetches an order with all of its items included.
+      summary: Fetches an order with all of its items included
       responses:
         200:
           description: OK
@@ -533,7 +533,7 @@ paths:
     post:
       tags:
         - Orders
-      summary: Add an item to an order.
+      summary: Add an item to an order
       description: >-
         Add a new items to the order represented by `orderId`.
       requestBody:
@@ -569,7 +569,7 @@ paths:
     delete:
       tags:
         - Orders
-      summary: Delete an individual item from an order.
+      summary: Delete an individual item from an order
       responses:
         204:
           description: No Content
@@ -587,7 +587,7 @@ paths:
     post:
       tags:
         - Orders
-      summary: Make a payment on an order.
+      summary: Make a payment on an order
       requestBody:
         $ref: "#/components/requestBodies/postPayment"
       responses:
