@@ -1,0 +1,25 @@
+{
+  "name": "gendocs",
+  "version": "0.1.0",
+  "description": "Document generation from swagger file.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openactive/booking-swagger.git"
+  },
+  "author": "phil.jackson@theodi.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/openactive/booking-swagger/issues"
+  },
+  "homepage": "https://github.com/openactive/booking-swagger#readme",
+  "dependencies": {
+    "js-yaml": "^3.11.0",
+    "json-schema-defaults": "^0.4.0",
+    "markdown-table": "^1.1.1",
+    "swagger-client": "^3.5.2"
+  }
+}
