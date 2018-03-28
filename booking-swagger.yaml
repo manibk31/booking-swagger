@@ -1670,12 +1670,36 @@ components:
             properties:
               type:
                 type: string
-                pattern: "^PaymentMethod$"
-                example: PaymentMethod
-              id:
+                pattern: "^Payment$"
+                example: Payment
+              paymentMethod:
                 type: string
                 format: uri
                 example: https://www.example.com/customers/472/paymentmethods/9765
+              totalPaidToProvider:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: MonetaryAmount
+                  value:
+                    type: string
+                    example: '8.00'
+                  currency:
+                    type: string
+                    example: GBP
+              totalPaidByCustomer:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    example: MonetaryAmount
+                  value:
+                    type: string
+                    example: '5.00'
+                  currency:
+                    type: string
+                    example: GBP
 
     postOrderItem:
       content:
