@@ -1670,7 +1670,7 @@ components:
             properties:
               type:
                 type: string
-                pattern: "^PaymentMethod"
+                pattern: "^PaymentMethod$"
                 example: PaymentMethod
               id:
                 type: string
