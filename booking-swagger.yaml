@@ -37,8 +37,8 @@ paths:
       - $ref: "#/components/parameters/LocaleHeader"
     description: >-
       Returns a feed of events that are wrapped in the Realtime Paged
-      Data Exchange data-structures that make consuming the feed 
-      easy.
+      Data Exchange data-structures that make consuming the feed
+      viable.
     get:
       tags:
         - Sessions
@@ -318,8 +318,13 @@ paths:
       - $ref: "#/components/parameters/startDate"
       - $ref: "#/components/parameters/endDate"
     description: >-
-      A list of bookings for a given customer.
+      Returns a [json:api paginated](http://jsonapi.org/) feed of
+      bookings made by the given customer.
+
+      This interface provides a useful way to derive a customer's
+      agenda for events to be attended.
     get:
+      summary: A list of bookings for a given customer.
       tags:
         - Customers
       responses:
@@ -354,9 +359,8 @@ paths:
       - $ref: "#/components/parameters/LocaleHeader"
       - $ref: "#/components/parameters/OnBehalfOfContactHeader"
       - $ref: "#/components/parameters/CustomerIdRequired"
-    description: >-
-      A list of stored payment methods for a given customer.
     get:
+      summary: A list of stored payment methods for a given customer
       tags:
         - Customers
       responses:
@@ -388,7 +392,7 @@ paths:
           content:
             application/json:
               schema:
-               $ref: "#/components/schemas/BookingWithEvent"
+                $ref: "#/components/schemas/BookingWithEvent"
         404-NotFound:
           description: NOT FOUND
           content:
@@ -417,9 +421,8 @@ paths:
       - $ref: "#/components/parameters/CustomerIdRequired"
       - $ref: "#/components/parameters/startDate"
       - $ref: "#/components/parameters/endDate"
-    description: >-
-      A list of bookings for a given customer.
     get:
+      summary: A list of bookings for a given customer
       tags:
         - Customers
       responses:
@@ -1108,6 +1111,7 @@ components:
             "deleted".
 
     BookingWithEvent:
+      type: object
       properties:
         "@context":
           type: string
