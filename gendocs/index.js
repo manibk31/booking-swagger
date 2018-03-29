@@ -9,6 +9,7 @@ function h1 (text) { console.log(`# ${text}\n`) }
 function h2 (text) { console.log(`## ${text}\n`) }
 function h3 (text) { console.log(`### ${text}\n`) }
 function h4 (text) { console.log(`#### ${text}\n`) }
+function h5 (text) { console.log(`##### ${text}\n`) }
 
 function maybeDesc(details) {
   if (details.description) { console.log(`${details.description}\n`) }
@@ -19,16 +20,15 @@ function maybeSummary(details) {
 }
 
 function generateExample(schema) {
-  console.log("```json\n" + JSON.stringify(defaults(schema), null, 2) + "\n```")
+  console.log("```json\n" + JSON.stringify(defaults(schema), null, 2) + "\n```\n")
 }
 
 function startMethod(method, details) {
-  h2(`${method.toUpperCase()} - ${details.summary}`)
+  h3(`${method.toUpperCase()} - ${details.summary}`)
 
-  maybeSummary(details)
   maybeDesc(details)
 
-  h3("Parameters")
+  h4("Parameters")
 
   if (details.parameters) {
     let table_data = [['name', 'appears in', 'type', 'example', 'description']]
@@ -45,18 +45,50 @@ function startMethod(method, details) {
   }
 
   if (details.requestBody) {
-    h3("Request body - (applicaiton/json)")
-    h4("Example")
+    h4("Request body - (applicaiton/json)")
+    h5("Example")
+
     generateExample(details.requestBody.content['application/json'].schema)
+  }
+
+  if (details.responses) {
+    h4("Successful responses")
+
+    if (details.responses["200"]) {
+      h5("200 - OK")
+
+      generateExample(details.responses["200"].content['application/json'].schema)
+      delete details.responses["200"]
+    }
+
+    if (details.responses["201"]) {
+      h5("201 - Created")
+      delete details.responses["201"]
+    }
+
+    if (details.responses["204"]) {
+      h5("204 - No Content")
+      delete details.responses["204"]
+    }
+
+    if (Object.keys(details.responses).length > 0) {
+      h4("Potential error responses")
+
+      for (const status of Object.keys(details.responses)) {
+        console.log(`* ${status} - ${details.responses[status].description}`)
+      }
+
+      console.log("\n")
+    }
   }
 }
 
 function startPath(path, details) {
-  h1(path)
+  h2(path)
 
   maybeDesc(details)
 
-  for (const method of ['get', 'post', 'put', 'patch']) {
+  for (const method of ['get', 'post', 'delete', 'put', 'patch']) {
     if (details[method]) {
       startMethod(method, details[method])
     }
