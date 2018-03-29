@@ -463,10 +463,8 @@ paths:
     post:
       tags:
         - Orders
-      summary: Reserve an Event’s space for a finite amount of time
+      summary: Reserve an Event space for a finite amount of time
       description: >-
-        Reserve an Event’s space for a finite amount of time.
-
         An object is created with an expiry time (which is expected to
         be equal to 180 seconds unless `beta:anonymousLeaseDuration` was
         set).
@@ -479,6 +477,9 @@ paths:
         If the lease times out before it is booked, the customer
         details provided with the lease must be discarded by the
         booking system.
+
+        The resource subsequently created will be revealed in via the
+        `Location` header.
       responses:
         201:
           description: Created
@@ -488,6 +489,12 @@ paths:
                 type: string
                 example: /orders/535
                 format: uri
+        400-BadRequest:
+          description: BAD REQUEST
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
       requestBody:
         $ref: "#/components/requestBodies/postOrder"
 
@@ -947,11 +954,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PayAction"
-            description: >-
-              This URL is the location that accepts payment
-              conformations as a POST. Once payment has been met, it is
-              up to the Seller to mark the `orderStatus` as
-              OrderDelivered.
 
     OrderedItem:
       type: object
